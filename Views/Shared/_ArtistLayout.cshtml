@@ -1,0 +1,94 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - MusicApp</title>
+
+    <!-- CSS chính -->
+    <link rel="stylesheet" href="~/css/spotify.css" />
+
+    <!-- Font Awesome cho icon -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
+<body>
+    <div class="main-container">
+        <!-- ========== SIDEBAR ========== -->
+        <div class="sidebar">
+            <div>
+                <a href="/Artist/Artist/Index" class="logo-link">
+                    <h2>MusicDB</h2>
+                </a>
+                <a href="/Artist/Library/List"><i class="fa-solid fa-book"></i> Thư viện</a>
+                <a href="/Artist/Playlist/List"><i class="fa-solid fa-plus"></i> Playlist</a>
+                <a href="/Artist/FavouriteSong/List"><i class="fa-solid fa-heart"></i> Bài hát yêu thích</a>
+                <a href="/Artist/Album/List"><i class="fa-solid fa-compact-disc"></i> Quản lý album</a>
+                <a href="/Artist/Song/List"><i class="fa-solid fa-music"></i> Quản lý bài hát</a>
+            </div>
+        </div>
+        <!-- ========== NỘI DUNG CHÍNH ========== -->
+        <div class="main-content">
+            <!-- HEADER -->
+            <div class="header">
+                <div class="search-bar">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" placeholder="Tìm kiếm bài hát, nghệ sĩ hoặc album..." />
+                </div>
+
+                <div style="display: flex; align-items: center; gap: 20px;">
+                    <a href="/Artist/Profile/Index" style="color:white; text-decoration:none;">Xem Hồ Sơ</a>
+                    <a href="/Account/Login" style="color:white; text-decoration:none;"><button class="btn-logout">Đăng xuất</button></a>
+                </div>
+            </div>
+
+            <!-- PHẦN HIỂN THỊ TRANG CON -->
+            <div class="playlists">
+                @RenderBody()
+            </div>
+
+            <!-- PLAYER DƯỚI CÙNG -->
+            <div class="player-bar">
+
+                <audio id="audioPlayer"></audio>
+
+                <!-- LEFT: Song Info -->
+                <div class="song-info">
+                    <img id="player-image" src="/images/default.png" width="55" height="55">
+                    <div class="text">
+                        <span id="player-title">Chưa chọn bài hát</span>
+                        <span id="player-artist">---</span>
+                    </div>
+                </div>
+
+                <!-- CENTER -->
+                <div class="player-center">
+                    <div class="time-display">
+                        <span id="currentTime">0:00</span>
+                        <input type="range" id="progressBar" min="0" max="100" value="0" class="progress-bar">
+                        <span id="totalTime">0:00</span>
+                    </div>
+
+                    <div class="player-controls">
+                        <i id="prevBtn" class="fa-solid fa-backward-step"></i>
+                        <i id="playPauseBtn" class="fa-solid fa-play-circle fa-2x"></i>
+                        <i id="nextBtn" class="fa-solid fa-forward-step"></i>
+                    </div>
+                </div>
+
+                <!-- RIGHT -->
+                <div class="volume-control">
+                    <i id="volume-icon" class="fa-solid fa-volume-high"></i>
+                    <input type="range" id="volumeSlider" min="0" max="1" step="0.01" value="1">
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scripts -->
+    @RenderSection("Scripts", required: false)
+    <script src="~/js/timeprogress.js"></script>
+    <script src="~/js/music-player.js"></script>
+</body>
+</html>

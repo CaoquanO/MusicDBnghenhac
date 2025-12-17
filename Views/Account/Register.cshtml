@@ -1,0 +1,21 @@
+﻿@{
+    ViewData["Title"] = "Đăng ký";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="auth-container">
+    <h2>Tạo tài khoản mới</h2>
+
+    <form method="post" action="/Account/Register">
+        <input type="text" name="username" placeholder="Tên đăng nhập" required />
+        <input type="email" name="email" placeholder="Email" required />
+        <input type="text" name="fullName" placeholder="Họ và tên" required />
+        <input type="date" name="birthDate" placeholder="Ngày sinh" required />
+        <input type="password" name="password" placeholder="Mật khẩu" required />
+        <input type="password" name="confirmPassword" placeholder="Xác nhận mật khẩu" required />
+
+        <button type="submit" class="btn-signup-submit">Đăng ký</button>
+    </form>
+
+    <p>Đã có tài khoản? <a href="/Account/Login">Đăng nhập</a></p>
+</div>

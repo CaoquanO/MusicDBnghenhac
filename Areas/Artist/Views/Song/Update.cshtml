@@ -1,0 +1,167 @@
+﻿@model MusicDBApp.Models.Song
+@{
+    ViewData["Title"] = "Update Song";
+    Layout = "~/Views/Shared/_ArtistLayout.cshtml";
+}
+
+<style>
+    .song-form-container {
+        max-width: 700px;
+        margin: 40px auto;
+        background-color: #1e1e1e;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 10px 25px rgba(0,0,0,0.6);
+        color: #fff;
+    }
+
+        .song-form-container h2 {
+            margin-bottom: 25px;
+            font-size: 28px;
+            font-weight: 600;
+            color: #1db954;
+            text-align: center;
+        }
+
+        .song-form-container table {
+            width: 100%;
+            border-collapse: separate;
+            border-spacing: 0 15px;
+        }
+
+        .song-form-container td:first-child {
+            width: 35%;
+            font-weight: 500;
+            color: #ccc;
+            padding-right: 10px;
+            vertical-align: middle;
+        }
+
+        .song-form-container input,
+        .song-form-container select {
+            width: 100%;
+            padding: 10px 12px;
+            background-color: #121212;
+            border: 1px solid #333;
+            border-radius: 6px;
+            color: #fff;
+            font-size: 14px;
+        }
+
+            .song-form-container input:focus,
+            .song-form-container select:focus {
+                outline: none;
+                border-color: #1db954;
+                box-shadow: 0 0 0 2px rgba(29,185,84,0.25);
+            }
+
+        .song-form-container img {
+            margin-top: 8px;
+            max-width: 120px;
+            border-radius: 6px;
+            border: 1px solid #333;
+        }
+
+        .song-form-container button {
+            margin-top: 25px;
+            width: 100%;
+            padding: 12px;
+            background-color: #1db954;
+            border: none;
+            border-radius: 8px;
+            color: #fff;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+            .song-form-container button:hover {
+                background-color: #17a74a;
+            }
+
+    .note {
+        font-size: 13px;
+        color: #aaa;
+        margin-top: 4px;
+    }
+</style>
+
+<div class="song-form-container">
+    <h2>Cập nhật bài hát</h2>
+
+    <form asp-action="Update" method="post" enctype="multipart/form-data">
+
+        <!-- Giữ SongId để POST -->
+        <input type="hidden" asp-for="SongId" />
+
+        <table>
+            <tr>
+                <td>Tên bài hát</td>
+                <td>
+                    <input asp-for="SongName" required />
+                </td>
+            </tr>
+
+            <tr>
+                <td>Thời lượng</td>
+                <td>
+                    <input asp-for="Duration" placeholder="mm:ss" type="string" required />
+                </td>
+            </tr>
+
+            <tr>
+                <td>Thể loại</td>
+                <td>
+                    <input asp-for="Category" required />
+                </td>
+            </tr>
+
+            <tr>
+                <td>Album</td>
+                <td>
+                    <select asp-for="AlbumId" required>
+                        <option value="">-- Chọn Album --</option>
+                        @foreach (var album in ViewBag.Albums)
+                        {
+                            <option value="@album.AlbumId">
+                                @album.AlbumName
+                            </option>
+                        }
+                    </select>
+                </td>
+            </tr>
+
+            <tr>
+                <td>File nhạc mới</td>
+                <td>
+                    <input type="file" name="uploadFile" accept=".mp3,.wav" />
+                    @if (!string.IsNullOrEmpty(Model.FilePath))
+                    {
+                        <div class="note">
+                            File hiện tại: <b>@Model.FilePath</b>
+                        </div>
+                    }
+                </td>
+            </tr>
+
+            <tr>
+                <td>Ảnh mới</td>
+                <td>
+                    <input type="file" name="uploadImage" accept=".jpg,.png,.jpeg" />
+                    @if (!string.IsNullOrEmpty(Model.SongImage))
+                    {
+                        <img src="@Model.SongImage" alt="Song Image" />
+                    }
+                </td>
+            </tr>
+        </table>
+
+        <button type="submit">Update Song</button>
+    </form>
+</div>
+
+@section Scripts {
+    <script src="~/js/listsong.js"></script>
+    <script src="~/js/listsong2.js"></script>
+    <script src="~/js/music-player.js"></script>
+}

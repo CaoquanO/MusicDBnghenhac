@@ -1,0 +1,95 @@
+﻿@model MusicDBApp.Models.Playlist
+
+@{
+    ViewData["Title"] = Model.PlaylistName;
+    Layout = "~/Views/Shared/_ArtistLayout.cshtml";
+
+}
+<style>
+    .header-section {
+        background: linear-gradient(to bottom, #505050, #121212);
+        padding: 30px;
+        display: flex;
+        align-items: end;
+        gap: 20px;
+    }
+
+    .big-icon {
+        width: 180px;
+        height: 180px;
+        background: #333;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 60px;
+    }
+
+    .table-dark-custom {
+        width: 100%;
+        color: #b3b3b3;
+    }
+
+        .table-dark-custom td,
+        .table-dark-custom th {
+            padding: 10px;
+            border-bottom: 1px solid #333;
+        }
+</style>
+<div class="header-section text-white">
+    <div class="big-icon">🎵</div>
+    <div>
+        <small>PLAYLIST</small>
+        <h1 style="font-size: 60px; font-weight: 900; margin: 0;">@Model.PlaylistName</h1>
+        <p class="mt-2 text-white-50">@Model.Songs.Count bài hát • Tạo ngày @Model.CreateDate?.ToString("dd/MM/yyyy")</p>
+    </div>
+</div>
+<div class="container-fluid px-4 pb-5" style="background:#121212; min-height:60vh;">
+    <div class="py-4 d-flex gap-3">
+        <button class="btn btn-success rounded-circle" style="width:50px;height:50px;">▶</button>
+        <button class="btn btn-outline-light rounded-pill" data-bs-toggle="modal" data-bs-target="#addSongModal">
+            Tìm thêm bài hát
+        </button>
+    </div>
+    <table class="table-dark-custom">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Tiêu đề</th>
+                <th>Ca sĩ</th>
+                <th>Thời lượng</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @{
+                int i = 1;
+            }
+            @foreach (var song in Model.Songs)
+            {
+                <tr>
+                    <td>@i</td>
+                    <td>
+                        <img src="@song.SongImage" width="40" height="40" style="object-fit:cover; margin-right:10px;" />
+                        <span style="color:white">@song.SongName</span>
+                    </td>
+                    <td>@song.Artist?.ArtistName</td>
+                    <td>@song.Duration</td>
+                    <td>
+                        <a href="/Artist/Playlist/RemoveSong?playlistId=@Model.PlaylistId&songId=@song.SongId">
+                            Remove
+                        </a>
+                    </td>
+                </tr>
+                i++;
+            }
+        </tbody>
+    </table>
+</div>
+
+@section Scripts {
+    <script src="~/js/listsong.js"></script>
+    <script src="~/js/listsong2.js"></script>
+    <script src="~/js/music-player.js"></script>
+    <script src="~/js/timeprogress.js"></script>
+
+}

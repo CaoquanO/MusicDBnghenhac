@@ -1,0 +1,178 @@
+﻿@model List<MusicDBApp.Models.Song>
+
+@{
+    ViewData["Title"] = "Chọn bài hát";
+    Layout = "~/Views/Shared/_ArtistLayout.cshtml";
+    int targetPlaylistId = ViewBag.TargetPlaylistId;
+    var existingIds = ViewBag.ExistingSongIds as List<int> ?? new List<int>();
+}
+
+<style>
+    //Css
+    .selection-page {
+        background-color: #121212;
+        padding: 40px;
+        height: 100vh;
+        box-sizing: border-box;
+        overflow: hidden;
+        color: #fff;
+    }
+
+    .header-area {
+        height: 100px;
+        border-bottom: 1px solid #333;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 30px;
+    }
+
+    .scroll-container {
+        height: calc(100vh - 220px);
+        overflow-y: auto;
+        padding-right: 15px;
+    }
+
+        .scroll-container::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .scroll-container::-webkit-scrollbar-track {
+            background: #1e1e1e;
+        }
+
+        .scroll-container::-webkit-scrollbar-thumb {
+            background: #555;
+            border-radius: 4px;
+        }
+
+    .table-spacious {
+        width: 100%;
+        border-collapse: separate;
+        border-spacing: 0 15px;
+    }
+
+        .table-spacious thead th {
+            color: #b3b3b3;
+            text-transform: uppercase;
+            font-size: 12px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #333;
+            position: sticky;
+            top: 0;
+            background-color: #121212;
+            z-index: 10;
+        }
+
+        .table-spacious tbody tr {
+            background-color: #1e1e1e;
+            transition: transform 0.2s;
+        }
+
+            .table-spacious tbody tr:hover {
+                background-color: #2a2a2a;
+                transform: scale(1.01);
+            }
+
+        .table-spacious tbody td {
+            padding: 15px 20px;
+            vertical-align: middle;
+        }
+
+            .table-spacious tbody td:first-child {
+                border-top-left-radius: 10px;
+                border-bottom-left-radius: 10px;
+            }
+
+            .table-spacious tbody td:last-child {
+                border-top-right-radius: 10px;
+                border-bottom-right-radius: 10px;
+            }
+
+    .btn-add-song {
+        background: transparent;
+        border: 1px solid #777;
+        color: white;
+        padding: 8px 25px;
+        border-radius: 50px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        .btn-add-song:hover {
+            background-color: #1DB954;
+            border-color: #1DB954;
+            color: black;
+            box-shadow: 0 0 10px rgba(29, 185, 84, 0.5);
+        }
+
+    .status-added {
+        color: #1DB954;
+        border: 1px solid #1DB954;
+        padding: 8px 20px;
+        border-radius: 50px;
+        font-size: 12px;
+        font-weight: bold;
+        display: inline-block;
+    }
+</style>
+
+
+<div class="selection-page">
+    <div class="header-area">
+        <div>
+            <h2 class="fw-bold">Thêm bài hát</h2>
+            <p class="text-white-50">Playlist ID: #@targetPlaylistId</p>
+        </div>
+        <a href="/Artist/Playlist/Details/@targetPlaylistId" class="btn btn-light rounded-pill fw-bold px-4">
+            Xong / Quay lại
+        </a>
+    </div>
+
+    <div class="scroll-container">
+        <table class="table-spacious">
+            <thead>
+                <tr>
+                    <th width="40%">Bài hát</th>
+                    <th width="25%">Ca sĩ</th>
+                    <th width="15%">Thời lượng</th>
+                    <th width="20%" class="text-end">Thêm vào Playlist</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <div class="d-flex align-items-center">
+                                <img src="@item.SongImage" width="50" height="50" style="object-fit:cover; border-radius:8px; margin-right:15px;">
+                                <span class="fw-bold fs-5">@item.SongName</span>
+                            </div>
+                        </td>
+                        <td class="text-white-50">@item.Artist?.ArtistName</td>
+                        <td class="text-white-50">@item.Duration</td>
+                        <td class="text-end">
+                            @if (existingIds.Contains(item.SongId))
+                            {
+                                <span class="status-added">✓ ĐÃ CÓ</span>
+                            }
+                            else
+                            {
+                                <form action="@Url.Action("AddSongToPlaylist", "Playlist", new { area = "Artist" })"
+                                      method="post"
+                                      style="display:inline;">
+
+                                    <input type="hidden" name="playlistId" value="@targetPlaylistId" />
+                                    <input type="hidden" name="songId" value="@item.SongId" />
+
+                                    <button type="submit" class="btn-add-song">Thêm +</button>
+                                </form>
+                            }
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

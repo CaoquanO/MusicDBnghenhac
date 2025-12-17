@@ -1,0 +1,158 @@
+﻿@{
+    ViewData["Title"] = "Album Manager";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    <style>
+        .sidebar div a:nth-child(7) {
+            color: #ffff;
+        }
+    </style>
+}
+@model IEnumerable<MusicDBApp.Models.Song>
+<body>
+    <style>
+        /* Styling cho Bảng */
+        .user-table-container {
+            overflow-y: scroll; /* Thêm thanh cuộn ngang nếu bảng quá rộng */
+            overflow-x: auto;
+            max-height: 620px;
+            /* (2) ẨN THANH CUỘN CHO CHROME, SAFARI, EDGE */
+            -ms-overflow-style: none; /* Dành cho Internet Explorer 10+ */
+            scrollbar-width: none; /* Dành cho Firefox */
+        }
+
+            .user-table-container::-webkit-scrollbar {
+                display: none; /* Ẩn thanh cuộn */
+                width: 0; /* Đặt chiều rộng thanh cuộn về 0 */
+            }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background-color: #1e1e1e; /* Nền bảng tối hơn */
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7); /* Đổ bóng sâu hơn */
+            border-radius: 8px; /* Bo tròn góc */
+        }
+
+
+        th, td {
+            padding: 15px 10px; /* Tăng padding để dễ đọc */
+            text-align: left;
+            border-bottom: 1px solid #333; /* Đường kẻ mờ */
+        }
+
+        /* Styling cho Đầu Bảng (Header) */
+        th {
+            background-color: #272727; /* Nền header tối */
+            color: #1db954; /* Màu xanh nổi bật cho tiêu đề cột */
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            font-weight: 700;
+            position: sticky; /* Giữ header lại khi cuộn */
+            top: 0;
+            z-index: 10;
+        }
+
+        /* Styling cho Hàng Dữ Liệu */
+        tr:nth-child(even) {
+            background-color: #1b1b1b; /* Nền tối xen kẽ */
+        }
+
+        tr:hover {
+            background-color: #3333aa30; /* Màu xanh nhẹ khi hover */
+            cursor: pointer;
+        }
+
+        /* Styling cho dữ liệu */
+        td {
+            color: #ddd;
+        }
+
+        /* Styling cho nút hành động (nếu có) */
+        .action-link {
+            color: #1db954;
+            text-decoration: none;
+            margin-right: 10px;
+            transition: color 0.2s;
+        }
+
+            .action-link:hover {
+                color: #1db954;
+            }
+
+        .title {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            height: 70px;
+        }
+
+            .title button {
+                background-color: #1db954;
+                border: none;
+                padding: 10px 15px;
+                color: white;
+                font-weight: 600;
+                border-radius: 5px;
+                cursor: pointer;
+                transition: background-color 0.3s;
+            }
+    </style>
+    <div class="title">
+        <h1 style=" font-size: 30px;
+        margin-bottom: 5px;
+        font-weight: 600;
+        color: #fff; /* Tiêu đề màu trắng nổi bật */
+        text-align: left;">
+            Danh Sách Bài Hát
+        </h1>
+        <a href="/Admin/Song/AddNew"> <button asp-controller="Song" asp-action="AddNew" class="btn btn-primary">Thêm Bài Hát Mới</button></a>
+    </div>
+    <div style="margin-bottom: 10px;">
+        <form asp-controller="Song" asp-action="Find" method="post" style="display:flex; gap:5px; align-items:center; margin-bottom:10px;">
+            <input type="text" name="searchName" placeholder="Tìm kiếm theo Tên Bài Hát "
+                   style="padding:10px; width:300px; background-color:#1e1e1e; color:white; border:1px solid #333; border-radius:5px;">
+            <button asp-action="Find" type="submit" style="background-color:#1db954; color:white; padding:10px 15px; border:none; border-radius:5px; cursor:pointer;">
+                Find
+            </button>
+        </form>
+    </div>
+    <div class="user-table-container">
+        <table>
+            <thead>
+                <tr>
+                    <th>Song ID</th>
+                    <th>Song Name</th>
+                    <th>Upload</th>
+                    <th>Duration </th>
+                    <th>Category</th>
+                    <th>Artist Name</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>@item.SongId</td>
+                        <td>@item.SongName</td>
+                        <td>@item.UploadDate</td>
+                        <td>@item.Duration</td>
+                        <td>@item.Category</td>
+                        <td>@item.Artist.ArtistName</td>
+                        <td>
+                            <a class="action-link" href="/Admin/Song/Update/@item.SongId">Update </a>|
+                            <a style="color:orangered;text-decoration:none" href="/Admin/Song/Delete/@item.SongId">Delete</a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</body>
+@section Scripts {
+    <script src="~/js/listsong.js"></script>
+    <script src="~/js/listsong2.js"></script>
+    <script src="~/js/music-player.js"></script>
+    <script src="~/js/timeprogress.js"></script>
+
+}

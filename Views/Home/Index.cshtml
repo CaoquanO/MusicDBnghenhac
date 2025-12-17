@@ -1,0 +1,187 @@
+﻿@{
+    ViewData["Title"] = "Trang chủ";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+    
+}
+@model IEnumerable<MusicDBApp.Models.Song>
+<style>
+    /* 1. CONTAINER CHÍNH */
+    .playlist-wrapper {
+        position: relative; /* Quan trọng để các nút mũi tên (absolute) nằm đúng vị trí */
+        margin-bottom: 30px;
+    }
+
+    /* 2. KHUNG CHỨA PLAYLIST: Đặt giới hạn hiển thị và ẩn thanh cuộn */
+    .carousel-container {
+        position: relative; /* CHUYỂN position: relative VÀO ĐÂY */
+        /* Đảm bảo container này đủ rộng để giới hạn khung nhìn cho các nút */
+        width: 100%;
+        overflow: visible; /* Cho phép các nút hiển thị bên ngoài (tùy chọn) */
+        max-width: calc(180px * 8 + 20px); /* 6 card * 180px + padding 10px*2 + gap cuối. Điều chỉnh nếu cần 7 card: calc(180px * 7 + 40px) */
+        min-height: 250px; /* Dựa trên chiều cao card (~160px ảnh + text) */
+    }
+    /* 3. KHUNG CHỨA PLAYLIST: Đặt giới hạn hiển thị và ẩn thanh cuộn */
+    .playlist-grid {
+        display: flex;
+        gap: 20px;
+        overflow-x: hidden; /* Giữ lại để ẩn các card bị tràn */
+        scroll-behavior: smooth;
+        padding-bottom: 10px;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    /* CARD: Ngăn không cho card bị co lại (flex-shrink: 0) */
+    .card {
+        background-color: #181818;
+        border-radius: 8px;
+        padding: 10px;
+        text-align: center;
+        color: white;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        /* Đảm bảo card có kích thước cố định và KHÔNG co lại */
+        width: 160px; /* Kích thước phù hợp với ảnh 160x160 */
+        flex-shrink: 0;
+    }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+
+        .card img {
+            width: 100%;
+            border-radius: 4px;
+        }
+
+        .card h4 {
+            margin: 10px 0 5px 0;
+            font-size: 16px;
+        }
+
+        .card p {
+            margin: 0;
+            font-size: 14px;
+            color: #b3b3b3;
+        }
+
+    /* 4. NÚT MŨI TÊN (CAROUSEL BUTTONS) */
+    .carousel-btn {
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        background-color: #000000; /* Nền đen */
+        border: none;
+        color: white;
+        font-size: 20px;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        z-index: 10;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.4);
+        display: flex; /* Dùng flex để căn giữa mũi tên */
+        justify-content: center;
+        align-items: center;
+    }
+
+        .carousel-btn.left {
+            left: 0; /* Đặt sát mép trái của wrapper */
+        }
+
+        .carousel-btn.right {
+            right: 0; /* Đặt sát mép phải của wrapper */
+            margin-right: 20px;
+        }
+
+    .carousel-container:hover .carousel-btn {
+        opacity: 1;
+    }
+
+    .main-content .a a:hover {
+        text-decoration: underline !important;
+    }
+
+</style>
+
+<div class="main-content">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <!-- Thay đổi justify-content -->
+        <h2 style="color: white; font-size: 24px; margin: 0;">Album</h2>
+        <a href="/Library/List" class="show-all-link" style="color: white; font-size: 24px; text-decoration: none; margin-right:30px;">Show all</a>
+    </div>
+    <div class="playlist-wrapper">
+        <div class="carousel-container" id="carouselContainer">
+            <div class="playlist-grid" id="playlistGrid">
+                @*hàm vòng lặp random *@
+                @foreach (var album in Model
+                                .Select(x => x.Album)
+                                .Where(a => a != null)
+                                .Distinct()
+                                .Take(10))
+                {
+                    <div class="card">
+                        <img src="@Url.Content(album.CoverImage ?? "~/images/no-image.png")"
+                             alt="@album.Title" style="width:160px;height:160px" />
+
+                        <h4>@album.Title</h4>
+                    </div>
+                }
+            </div>
+            <button class="carousel-btn left" id="leftBtn">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+            <button class="carousel-btn right" id="rightBtn">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+        </div>
+    </div>
+</div>
+
+
+<div class="main-content">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
+        <h2 style="color: white; font-size: 24px; margin: 0;">Dành cho bạn</h2>
+        <a href="#" class="show-all-link" style="color: white; font-size: 24px; text-decoration: none; margin-right:30px;">Show all</a>
+    </div>
+
+    <div class="playlist-wrapper">
+        <div class="carousel-container" id="carouselContainer2">
+
+            <div class="playlist-grid" id="playlistGrid2">
+                @foreach (var song in Model.OrderBy(x => Guid.NewGuid()).Take(20))
+                {
+                    <div class="card song-card"
+                         onclick="playNewSong('@song.FilePath','@song.SongImage','@song.SongName','@song.Artist.ArtistName')"
+                         data-song="@song.FilePath"
+                         data-title="@song.SongName"
+                         data-artist="@song.Artist.ArtistName"
+                         data-image="@song.SongImage">
+                        <img src="@Url.Content(song.SongImage ?? "~/images/no-image.png")"
+                             alt="@song.SongName" style="width:160px;height:160px" />
+
+                        <h4>@song.SongName</h4>
+                        <p>@song.Artist.ArtistName</p>
+                    </div>
+
+                }
+            </div>
+
+            <button class="carousel-btn left" id="leftBtn2">
+                <i class="fa-solid fa-chevron-left"></i>
+            </button>
+
+            <button class="carousel-btn right" id="rightBtn2">
+                <i class="fa-solid fa-chevron-right"></i>
+            </button>
+
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="~/js/listsong.js"></script>
+    <script src="~/js/listsong2.js"></script>
+}

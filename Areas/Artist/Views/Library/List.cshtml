@@ -1,0 +1,119 @@
+﻿@{
+    ViewData["Title"] = "Your Library";
+    Layout = "~/Views/Shared/_ArtistLayout.cshtml";
+}
+
+@model IEnumerable<MusicDBApp.Models.Album>
+
+<style>
+    /* VÙNG CUỘN DỌC */
+    .scroll-area:nth-child(1) {
+        max-height: 230px; /* Độ cao tối đa trước khi bật thanh cuộn */
+        overflow-y: auto; /* Cuộn dọc */
+        padding-right: 10px; /* Để tránh đụng vào scroll bar */
+    }
+
+    .scroll-area:nth-child(2) {
+        max-height: 300px; /* Độ cao tối đa trước khi bật thanh cuộn */
+        overflow-y: auto; /* Cuộn dọc */
+        padding-right: 10px; /* Để tránh đụng vào scroll bar */
+    }
+
+    /* GRID 7 ITEMS MỖI HÀNG */
+    .playlist-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 160px);
+        gap: 20px; /* khoảng cách giữa các item */
+        padding: 10px 0;
+    }
+
+    /* CARD */
+    .card {
+        background-color: #181818;
+        border-radius: 8px;
+        padding: 10px;
+        width: 160px;
+        text-align: center;
+        color: white;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+
+        .card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+
+        .card img {
+            width: 100%;
+            height: 160px;
+            object-fit: cover;
+            border-radius: 4px;
+        }
+
+        .card h4 {
+            margin-top: 10px;
+            font-size: 16px;
+        }
+
+        .card p {
+            margin: 0;
+            color: #b3b3b3;
+            font-size: 14px;
+        }
+</style>
+
+
+<!-- ALBUM -->
+<div class="main-content">
+    <h2 style="color:white; font-size:24px;">Album</h2>
+
+    <div class="scroll-area">
+        <div class="playlist-grid">
+            @foreach (var album in Model)
+            {
+                <div class="card">
+                    <img src="@Url.Content(album.CoverImage ?? "~/images/no-image.png")" />
+                    <h4>@album.Title</h4>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<!-- DÀNH CHO BẠN -->
+<div class="main-content">
+    <div style="display:flex; justify-content:space-between;">
+        <h2 style="color:white; font-size:24px;">Dành cho bạn</h2>
+    </div>
+
+    <div class="scroll-area">
+        <div class="playlist-grid">
+            @foreach (var album in Model)
+            {
+                foreach (var song in album.Songs)
+                {
+                    <div class="card song-card"
+                         onclick="playNewSong('@song.FilePath','@song.SongImage','@song.SongName','@song.Artist.ArtistName')"
+                         data-song="@song.FilePath"
+                         data-title="@song.SongName"
+                         data-artist="@song.Artist.ArtistName"
+                         data-image="@song.SongImage">
+
+                        <img src="@Url.Content(song.SongImage ?? "~/images/no-image.png")" />
+                        <h4>@song.SongName</h4>
+                        <p>@album.Artist.ArtistName</p>
+                    </div>
+                }
+            }
+        </div>
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/listsong.js"></script>
+    <script src="~/js/listsong2.js"></script>
+    <script src="~/js/music-player.js"></script>
+
+}

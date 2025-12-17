@@ -1,0 +1,92 @@
+﻿@model MusicDBApp.Models.Playlist
+
+@{
+    ViewData["Title"] = "Xóa Playlist";
+    Layout = "~/Views/Shared/_ArtistLayout.cshtml";
+}
+
+<style>
+    /* CSS cho khung chứa */
+    .delete-container {
+        max-width: 600px;
+        margin: 50px auto;
+        background: #181818;
+        padding: 30px;
+        border-radius: 8px;
+        color: white;
+        text-align: center;
+        box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+
+    .warning-text {
+        color: #ff4d4d;
+        font-weight: bold;
+        font-size: 1.2rem;
+        margin-bottom: 20px;
+    }
+
+    .playlist-info {
+        background: #282828;
+        padding: 15px;
+        border-radius: 6px;
+        margin-bottom: 30px;
+        text-align: left;
+    }
+
+    /* CSS CHO NÚT HỦY */
+    .btn-cancel {
+        display: inline-block; /* Thêm dòng này để thẻ 'a' hiển thị như nút */
+        background: #535353;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        text-decoration: none;
+        margin-right: 10px;
+        border: none;
+        font-weight: bold;
+        transition: 0.2s;
+        cursor: pointer;
+    }
+
+        .btn-cancel:hover {
+            background: #666;
+            color: white;
+        }
+
+    /* CSS CHO NÚT XÓA */
+    .btn-confirm {
+        background: #ff4d4d;
+        color: white;
+        padding: 10px 20px;
+        border-radius: 20px;
+        border: none;
+        font-weight: bold;
+        cursor: pointer;
+        transition: 0.2s;
+    }
+
+        .btn-confirm:hover {
+            background: #e60000;
+        }
+</style>
+
+<div class="delete-container">
+    <h2 class="mb-4">Xóa Playlist?</h2>
+
+    <div class="warning-text">
+        Bạn có chắc muốn xóa vĩnh viễn Playlist này không?
+    </div>
+
+    <div class="playlist-info">
+        <p><strong>Tên Playlist:</strong> @Model.PlaylistName</p>
+        <p><strong>Ngày tạo:</strong> @Model.CreateDate</p>
+        <p><strong>Số bài hát:</strong> @(Model.Songs != null ? Model.Songs.Count : 0)</p>
+    </div>
+
+    <form asp-action="Delete" method="post" class="mt-4">
+
+        <input type="hidden" name="PlaylistId" value="@Model.PlaylistId" />
+
+        <button type="submit" class="btn-confirm">Xóa</button>
+    </form>
+</div>

@@ -1,0 +1,57 @@
+﻿@{
+    ViewData["Title"] = "Tạo Playlist";
+    Layout = "~/Views/Shared/_ArtistLayout.cshtml";
+}
+@model MusicDBApp.Models.Playlist
+
+<style>
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    label {
+        font-weight: bold;
+    }
+
+    input, select {
+        width: 100%;
+        padding: 8px;
+        margin-top: 5px;
+    }
+
+    button {
+        padding: 10px 20px;
+        background: #28a745;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+        button:hover {
+            background: #218838;
+        }
+</style>
+
+<h2>Tạo Playlist Mới</h2>
+
+<form asp-action="Create" asp-area="Artist" asp-controller="Playlist" method="post" class="container mt-4">
+
+    <div class="col-md-6">
+        <label class="form-label">Tên Playlist</label>
+        <input type="text" name="PlaylistName" class="form-control" placeholder="Nhập tên playlist..." required />
+    </div>
+
+    <div class="col-md-6">
+        <label class="form-label">IsPublic</label>
+        <select name="IsPublic" class="form-control">
+            <option value="Yes">Công khai</option>
+            <option value="No">Riêng tư</option>
+        </select>
+    </div>
+
+    <div class="mt-4">
+        <button type="submit">Lưu Playlist</button>
+        <a asp-action="List" style="margin-left: 10px; text-decoration: none; color: black;">Quay lại</a>
+    </div>
+
+</form>

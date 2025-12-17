@@ -1,0 +1,103 @@
+﻿@model MusicDBApp.Models.User
+@{
+    ViewBag.Title = "Hồ sơ người dùng";
+    Layout = "~/Views/Shared/_ArtistLayout.cshtml";
+}
+<style>
+    .profile-container {
+        padding: 20px;
+        color: white;
+    }
+
+    .profile-card {
+        background: #181818;
+        padding: 20px;
+        border-radius: 10px;
+        width: 400px;
+    }
+
+    .profile-field {
+        margin-bottom: 15px;
+        display: flex;
+        flex-direction: column;
+    }
+
+        .profile-field input {
+            padding: 10px;
+            border-radius: 6px;
+            border: none;
+            background: #2c2c2c;
+            color: white;
+        }
+
+    .password-wrapper {
+        position: relative;
+    }
+
+        .password-wrapper input {
+            width: 87%;
+            padding-right: 40px; /* chừa khoảng cho icon */
+        }
+        .password-wrapper i {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #ccc;
+            font-size: 18px;
+        }
+
+</style>
+<div class="profile-container">
+    <h2>Hồ sơ người dùng</h2>
+    <div class="profile-card">
+        <div class="profile-field">
+            <label>UserName:</label>
+            <input value="@Model.UserName" readonly />
+        </div>
+        <div class="profile-field">
+            <label>Email:</label>
+            <input value="@Model.Email" readonly />
+        </div>
+        <div class="profile-field">
+            <label>Password:</label>
+
+            <div class="password-wrapper">
+                <input type="password" id="passwordField" value="@Model.Password" readonly />
+                <i class="fa-solid fa-eye" id="toggleEye"></i>
+            </div>
+        </div>
+
+
+        <div class="profile-field">
+            <label>Full Name:</label>
+            <input value="@Model.FullName" readonly />
+        </div>
+
+    </div>
+</div>
+
+
+@section Scripts {
+    <script src="~/js/listsong.js"></script>
+    <script src="~/js/listsong2.js"></script>
+    <script src="~/js/music-player.js"></script>
+    <script>
+        const pwd = document.getElementById("passwordField");
+        const eye = document.getElementById("toggleEye");
+
+        eye.addEventListener("click", () => {
+            if (pwd.type === "password") {
+                pwd.type = "text";
+                eye.classList.remove("fa-eye");
+                eye.classList.add("fa-eye-slash");
+            } else {
+                pwd.type = "password";
+                eye.classList.remove("fa-eye-slash");
+                eye.classList.add("fa-eye");
+            }
+        });
+
+    </script>
+}

@@ -1,0 +1,96 @@
+﻿@{
+    ViewData["Title"] = "Danh sách Playlist";
+    Layout = "~/Views/Shared/_ArtistLayout.cshtml";
+    <style>
+        .sidebar div a:nth-child(3) {
+            color: #ffff;
+        }
+    </style>
+}
+@model IEnumerable<MusicDBApp.Models.Playlist>
+<style>
+    .playlist-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 20px;
+    }
+
+    .playlist-card {
+        background: #181818;
+        padding: 15px;
+        border-radius: 6px;
+        color: white;
+        transition: 0.3s;
+    }
+
+        .playlist-card:hover {
+            background: #282828;
+        }
+
+    .card-link {
+        text-decoration: none;
+        color: inherit;
+        display: block;
+    }
+
+    .cover-box {
+        width: 100%;
+        aspect-ratio: 1;
+        background: #333;
+        margin-bottom: 10px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: 4px;
+    }
+
+    .btn-green {
+        background: #1DB954;
+        color: black;
+        font-weight: bold;
+        border-radius: 20px;
+        padding: 8px 20px;
+    }
+</style>
+
+<div class="container-fluid pt-4 text-white">
+    <div class="d-flex justify-content-between align-items-end mb-4">
+        <h2>Tất cả Playlist</h2>
+
+        <a href="/Artist/Playlist/Create" class="card-link">
+            <button type="button" class="btn btn-green" data-bs-toggle="modal" data-bs-target="#createModal">
+                + Tạo Playlist
+            </button>
+        </a>
+    </div>
+
+    <div class="playlist-grid">
+        @foreach (var item in Model)
+        {
+            <div class="playlist-card">
+                <a href="/Artist/Playlist/Details/@item.PlaylistId" class="card-link">
+
+                    <div class="cover-box">
+                        <span style="font-size: 40px;">🎵</span>
+                    </div>
+
+                    <div style="font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">
+                        @item.PlaylistName
+                    </div>
+
+                    <div style="font-size: 13px; color: #b3b3b3;">
+                        @item.Songs.Count bài hát
+                    </div>
+
+                </a>
+            </div>
+        }
+    </div>
+</div>
+@section Scripts {
+    <script src="~/js/listsong.js"></script>
+    <script src="~/js/listsong2.js"></script>
+    <script src="~/js/music-player.js"></script>
+    <script src="~/js/timeprogress.js"></script>
+
+}

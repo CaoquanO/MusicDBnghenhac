@@ -1,0 +1,26 @@
+﻿@{
+    ViewData["Title"] = "Đăng nhập";
+    Layout = "~/Views/Shared/_LoginLayout.cshtml";
+}
+
+<div class="auth-container">
+    <h2>Đăng nhập</h2>
+
+    <form method="post" action="/Account/Login">
+        <input type="text" name="username" placeholder="Tên đăng nhập" required />
+
+        <input type="password" name="password" placeholder="Mật khẩu" required />
+
+        <button type="submit">Đăng nhập</button>
+
+        @if (ViewBag.Error != null)
+        {
+            <p style="color:red">@ViewBag.Error</p>
+        }
+    </form>
+
+    <p>
+        Chưa có tài khoản?
+        <a href="/Account/Register">Đăng ký ngay</a>
+    </p>
+</div>

@@ -1,0 +1,102 @@
+﻿
+@{
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Update User";
+    <style>
+        .sidebar div a:nth-child(5) {
+            color: #ffff;
+        }
+    </style>
+}
+@model MusicDBApp.Models.User
+<style>
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        max-width: 600px;
+    }
+
+    tr {
+        background-color: black;
+        color: white;
+    }
+
+    th, td {
+        border: 1px solid #ddd;
+        padding: 8px;
+        text-align: left;
+    }
+
+    input[type="text"], input[type="email"], input[type="password"] {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    select {
+        width: 100%;
+        padding: 8px;
+        box-sizing: border-box;
+    }
+
+    button {
+        padding: 10px 20px;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        cursor: pointer;
+    }
+
+        button:hover {
+            background-color: #45a049;
+        }
+</style>
+
+
+<h2>Cập nhật người dùng</h2>
+<form asp-action="Update" asp-controller="User" method="post">
+    <table>
+        <thead>
+            <tr>
+                <th>Field</th>
+                <th>Input</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>User ID</td>
+                <td><input class="form-control" type="text" name="UserId" placeholder="Enter User ID" asp-for="UserId" value="@Model.UserId" required /></td>
+            </tr>
+            <tr>
+                <td>User Name</td>
+                <td><input class="form-control" type="text" name="UserName" placeholder="Enter User Name" asp-for="UserName" value="@Model.UserName" required /></td>
+            </tr>
+            <tr>
+                <td>Email</td>
+                <td><input class="form-control" type="email" name="Email" plac  eholder="Enter Email" asp-for="Email" value="@Model.Email" required /></td>
+            </tr>
+            <tr>
+                <td>Full Name</td>
+                <td><input class="form-control" type="text" name="FullName" placeholder="Enter Full Name" asp-for="FullName" value="@Model.FullName" required /></td>
+            </tr>
+            <tr>
+                <td>Password</td>
+                <td><input class="form-control" type="password" name="Password" placeholder="Enter Password" asp-for="Password" value="@Model.Password" required /></td>
+            </tr>
+            <tr>
+                <td>Role</td>
+                <td>
+                    <select asp-for="RoleId" required>
+                        <option value="">-- Chọn vai trò --</option>
+                        <option value="Admin">Quản trị viên</option>
+                        <option value="Artist">Nghệ sĩ</option>
+                        <option value="User">Người dùng</option>
+                    </select>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <br>
+    <button type="submit">Submit</button>
+</form>
