@@ -8,195 +8,206 @@ namespace MusicDBApp.Areas.Artist.Controllers
     [Area("Artist")]
     public class PlaylistController : Controller
     {
-        private readonly MusicDbContext _ctx;
-
+        public MusicDbContext ctx;
         public PlaylistController(MusicDbContext ctx)
         {
-            _ctx = ctx;
+            this.ctx = ctx;
         }
-
-        // =========================
-        // HÀM DÙNG CHUNG
-        // =========================
-        private int? GetArtistId()
+        private int? GetCurrentArtistId()
         {
-            if (HttpContext.Session.GetString("Role") != "Artist")
-                return null;
-
+            var role = HttpContext.Session.GetString("Role");
+            if (role != "Artist") return null;
             return HttpContext.Session.GetInt32("ArtistID");
         }
-
-        // =========================
-        // LIST PLAYLIST
-        // =========================
+        //List
         public IActionResult List()
         {
-            int? artistId = GetArtistId();
-            if (artistId == null)
-                return RedirectToAction("Login", "Account", new { area = "" });
+            int? artistId = GetCurrentArtistId();
+            if (artistId == null) return RedirectToAction("Login", "Account", new { area = "" });
 
-            var playlists = _ctx.Playlists
-                .Where(p => p.UserId == artistId)
+            var artist = ctx.Artists.FirstOrDefault(a => a.ArtistId == artistId);
+            if (artist == null) return RedirectToAction("Login");
+            int realUserId = artist.UserId;
+
+            List<Playlist> playlists = ctx.Playlists
+                .Where(x => x.UserId == realUserId)
                 .Include(p => p.Songs)
-                .OrderByDescending(p => p.CreateDate)
+                .OrderByDescending(x => x.CreateDate)
                 .ToList();
 
             return View(playlists);
         }
 
-        // =========================
-        // DETAILS
-        // =========================
+        //Detail Page
         public IActionResult Details(int id)
         {
-            int? artistId = GetArtistId();
-            if (artistId == null)
-                return RedirectToAction("Login", "Account", new { area = "" });
+            int? artistId = GetCurrentArtistId();
+            if (artistId == null) return RedirectToAction("Login", "Account", new { area = "" });
 
-            var playlist = _ctx.Playlists
-                .Include(p => p.Songs)
+            var artist = ctx.Artists.FirstOrDefault(a => a.ArtistId == artistId);
+            if (artist == null) return RedirectToAction("Login");
+            int realUserId = artist.UserId;
+
+            Playlist p = ctx.Playlists
+                .Include(x => x.Songs)
                 .ThenInclude(s => s.Artist)
-                .FirstOrDefault(p => p.PlaylistId == id && p.UserId == artistId);
+                .FirstOrDefault(x => x.PlaylistId == id && x.UserId == realUserId); 
 
-            if (playlist == null)
-                return NotFound();
+            if (p == null) return NotFound();
 
-            // Chỉ lấy bài hát của chính Artist
-            ViewBag.AllSongs = new SelectList(
-                _ctx.Songs.Where(s => s.ArtistId == artistId),
-                "SongId",
-                "SongName"
-            );
-
-            return View(playlist);
+            ViewBag.AllSongs = new SelectList(ctx.Songs.ToList(), "SongId", "SongName");
+            return View(p);
         }
 
-        // =========================
-        // CREATE PLAYLIST
-        // =========================
+        //Add Song into Playlist
         [HttpGet]
-        public IActionResult Create()
+        public IActionResult SelectSong(int playlistId)
         {
-            if (GetArtistId() == null)
-                return RedirectToAction("Login", "Account", new { area = "" });
+            int? artistId = GetCurrentArtistId();
+            if (artistId == null) return RedirectToAction("Login", "Account", new { area = "" });
 
-            return View();
+            var artist = ctx.Artists.FirstOrDefault(a => a.ArtistId == artistId);
+            if (artist == null) return RedirectToAction("Login");
+            int realUserId = artist.UserId;
+
+            var allSongs = ctx.Songs.Include(s => s.Artist).ToList();
+            var existingSongIds = ctx.Playlists
+                .Where(p => p.PlaylistId == playlistId && p.UserId == realUserId) 
+                .SelectMany(p => p.Songs.Select(s => s.SongId))
+                .ToList();
+
+            ViewBag.TargetPlaylistId = playlistId;
+            ViewBag.ExistingSongIds = existingSongIds;
+
+            return View(allSongs);
         }
 
         [HttpPost]
+        public IActionResult AddSongToPlaylist(int playlistId, int songId)
+        {
+            int? artistId = GetCurrentArtistId();
+            if (artistId == null) return RedirectToAction("Login", "Account", new { area = "" });
+
+            var artist = ctx.Artists.FirstOrDefault(a => a.ArtistId == artistId);
+            if (artist == null) return RedirectToAction("Login");
+            int realUserId = artist.UserId;
+
+            var p = ctx.Playlists
+                .Include(x => x.Songs)
+                .FirstOrDefault(x => x.PlaylistId == playlistId && x.UserId == realUserId); 
+
+            var s = ctx.Songs.FirstOrDefault(x => x.SongId == songId);
+
+            if (p != null && s != null)
+            {
+                if (!p.Songs.Contains(s))
+                {
+                    p.Songs.Add(s);
+                    ctx.SaveChanges();
+            }
+            }
+
+            return RedirectToAction("Details", new { id = playlistId });
+        }
+
+        //Delete Song in Playlist
+        [HttpGet]
+        public IActionResult RemoveSong(int playlistId, int songId)
+        {
+            int? artistId = GetCurrentArtistId();
+            if (artistId == null) return RedirectToAction("Login", "Account", new { area = "" });
+
+            var artist = ctx.Artists.FirstOrDefault(a => a.ArtistId == artistId);
+            if (artist == null) return RedirectToAction("Login");
+            int realUserId = artist.UserId;
+
+            var p = ctx.Playlists
+                .Include(x => x.Songs)
+                .FirstOrDefault(x => x.PlaylistId == playlistId && x.UserId == realUserId); 
+
+            if (p != null)
+            {
+                var s = p.Songs.FirstOrDefault(x => x.SongId == songId);
+                if (s != null)
+                {
+                    p.Songs.Remove(s);
+                    ctx.SaveChanges();
+            }
+            }
+            return RedirectToAction("Details", new { id = playlistId });
+        }
+
+        //Create Playlist
+        [HttpGet]
+        public IActionResult Create()
+        {
+            if (GetCurrentArtistId() == null)
+            {
+                return RedirectToAction("Login", "Account", new { area = "" });
+            }
+            return View(new Playlist());
+        }
+
+        // 
+        [HttpPost]
         public IActionResult Create(Playlist model)
         {
-            int? artistId = GetArtistId();
-            if (artistId == null)
-                return RedirectToAction("Login", "Account", new { area = "" });
-
-            if (string.IsNullOrWhiteSpace(model.PlaylistName))
+            if (string.IsNullOrEmpty(model.PlaylistName))
             {
-                ModelState.AddModelError("", "Tên playlist không được để trống");
                 return View(model);
             }
 
-            model.UserId = artistId.Value;
+            int? artistId = GetCurrentArtistId();
+            if (artistId == null) return RedirectToAction("Login", "Account", new { area = "" });
+
+            var artist = ctx.Artists.FirstOrDefault(a => a.ArtistId == artistId);
+            if (artist == null) return RedirectToAction("Login");
+            int realUserId = artist.UserId;
+
+            model.UserId = realUserId; 
             model.CreateDate = DateTime.Now;
 
-            _ctx.Playlists.Add(model);
-            _ctx.SaveChanges();
+            ctx.Playlists.Add(model);
+            ctx.SaveChanges();
 
             return RedirectToAction("List");
         }
 
-        // =========================
-        // ADD SONG TO PLAYLIST
-        // =========================
-        [HttpPost]
-        public IActionResult AddSong(int playlistId, int songId)
-        {
-            int? artistId = GetArtistId();
-            if (artistId == null)
-                return RedirectToAction("Login", "Account", new { area = "" });
-
-            var playlist = _ctx.Playlists
-                .Include(p => p.Songs)
-                .FirstOrDefault(p => p.PlaylistId == playlistId && p.UserId == artistId);
-
-            if (playlist == null)
-                return NotFound();
-
-            var song = _ctx.Songs.FirstOrDefault(s => s.SongId == songId && s.ArtistId == artistId);
-            if (song == null)
-                return NotFound();
-
-            if (!playlist.Songs.Any(s => s.SongId == songId))
-            {
-                playlist.Songs.Add(song);
-                _ctx.SaveChanges();
-            }
-
-            return RedirectToAction("Details", new { id = playlistId });
-        }
-
-        // =========================
-        // REMOVE SONG
-        // =========================
-        [HttpGet]
-        public IActionResult RemoveSong(int playlistId, int songId)
-        {
-            int? artistId = GetArtistId();
-            if (artistId == null)
-                return RedirectToAction("Login", "Account", new { area = "" });
-
-            var playlist = _ctx.Playlists
-                .Include(p => p.Songs)
-                .FirstOrDefault(p => p.PlaylistId == playlistId && p.UserId == artistId);
-
-            if (playlist == null)
-                return NotFound();
-
-            var song = playlist.Songs.FirstOrDefault(s => s.SongId == songId);
-            if (song != null)
-            {
-                playlist.Songs.Remove(song);
-                _ctx.SaveChanges();
-            }
-
-            return RedirectToAction("Details", new { id = playlistId });
-        }
-
-        // =========================
-        // DELETE PLAYLIST
-        // =========================
+        //Delete Playlist
         [HttpGet]
         public IActionResult Delete(int id)
         {
-            int? artistId = GetArtistId();
-            if (artistId == null)
-                return RedirectToAction("Login", "Account", new { area = "" });
+            int? artistId = GetCurrentArtistId();
+            if (artistId == null) return RedirectToAction("Login", "Account", new { area = "" });
 
-            var playlist = _ctx.Playlists
-                .FirstOrDefault(p => p.PlaylistId == id && p.UserId == artistId);
+            var artist = ctx.Artists.FirstOrDefault(a => a.ArtistId == artistId);
+            if (artist == null) return RedirectToAction("Login");
+            int realUserId = artist.UserId;
 
-            if (playlist == null)
-                return NotFound();
-
-            return View(playlist);
+            var p = ctx.Playlists
+                .Include(x => x.Songs)
+                .FirstOrDefault(x => x.PlaylistId == id && x.UserId == realUserId); 
+            return View(p);
         }
 
         [HttpPost]
-        public IActionResult DeleteConfirmed(int playlistId)
+        public IActionResult Delete(Playlist model)
         {
-            int? artistId = GetArtistId();
-            if (artistId == null)
-                return RedirectToAction("Login", "Account", new { area = "" });
+            int? artistId = GetCurrentArtistId();
+            if (artistId == null) return RedirectToAction("Login", "Account", new { area = "" });
 
-            var playlist = _ctx.Playlists
-                .Include(p => p.Songs)
-                .FirstOrDefault(p => p.PlaylistId == playlistId && p.UserId == artistId);
+            var artist = ctx.Artists.FirstOrDefault(a => a.ArtistId == artistId);
+            if (artist == null) return RedirectToAction("Login");
+            int realUserId = artist.UserId;
+            var p = ctx.Playlists
+                .Include(x => x.Songs)
+                .FirstOrDefault(x => x.PlaylistId == model.PlaylistId && x.UserId == realUserId); 
 
-            if (playlist != null)
+            if (p != null)
             {
-                playlist.Songs.Clear();
-                _ctx.Playlists.Remove(playlist);
-                _ctx.SaveChanges();
+                p.Songs.Clear();
+                ctx.Playlists.Remove(p);
+                ctx.SaveChanges();
             }
 
             return RedirectToAction("List");
