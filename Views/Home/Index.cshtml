@@ -116,18 +116,15 @@
         <div class="carousel-container" id="carouselContainer">
             <div class="playlist-grid" id="playlistGrid">
                 @*hàm vòng lặp random *@
-                @foreach (var album in Model
-                                .Select(x => x.Album)
-                                .Where(a => a != null)
-                                .Distinct()
-                                .Take(10))
+                @foreach (var album in Model.Select(x => x.Album).Where(a => a != null).Distinct().Take(10))
                 {
+                    <a href="/Home/AlbumDetails?id=@album.AlbumId" style="text-decoration:none; color:inherit;">
                     <div class="card">
                         <img src="@Url.Content(album.CoverImage ?? "~/images/no-image.png")"
                              alt="@album.Title" style="width:160px;height:160px" />
-
                         <h4>@album.Title</h4>
                     </div>
+                    </a>
                 }
             </div>
             <button class="carousel-btn left" id="leftBtn">

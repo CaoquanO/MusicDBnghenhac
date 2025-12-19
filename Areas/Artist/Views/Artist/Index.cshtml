@@ -108,28 +108,34 @@
 
 <div class="main-content">
     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px;">
-        <!-- Thay đổi justify-content -->
         <h2 style="color: white; font-size: 24px; margin: 0;">Album</h2>
-        <a href="#" class="show-all-link" style="color: white; font-size: 24px; text-decoration: none; margin-right:30px;">Show all</a>
+
+        <a href="/Home/AllAlbums" class="show-all-link" style="color: white; font-size: 24px; text-decoration: none; margin-right:30px;">Show all</a>
     </div>
+
     <div class="playlist-wrapper">
         <div class="carousel-container" id="carouselContainer">
             <div class="playlist-grid" id="playlistGrid">
-                @*hàm vòng lặp random *@
+
+                @* Vòng lặp lấy Album *@
                 @foreach (var album in Model
                                 .Select(x => x.Album)
                                 .Where(a => a != null)
                                 .Distinct()
                                 .Take(10))
                 {
+                    <a href="/Home/AlbumDetails?id=@album.AlbumId" style="text-decoration:none; color:inherit;">
+
                     <div class="card">
                         <img src="@Url.Content(album.CoverImage ?? "~/images/no-image.png")"
                              alt="@album.Title" style="width:160px;height:160px" />
-
                         <h4>@album.Title</h4>
                     </div>
+
+                    </a>
                 }
             </div>
+
             <button class="carousel-btn left" id="leftBtn">
                 <i class="fa-solid fa-chevron-left"></i>
             </button>
